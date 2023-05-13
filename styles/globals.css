@@ -89,6 +89,10 @@
   @apply mt-5 text-5xl font-extrabold leading-[1.15] text-black sm:text-6xl;
 }
 
+.movie_text {
+  @apply  text-2xl font-extrabold leading-[1.15] text-black sm:text-6xl;
+}
+
 .orange_gradient {
   @apply bg-gradient-to-r from-amber-500 via-orange-600 to-yellow-500 bg-clip-text text-transparent;
 }
@@ -153,6 +157,9 @@
   @apply flex-1 break-inside-avoid rounded-lg border border-gray-300 bg-white/20 bg-clip-padding p-6 pb-4 backdrop-blur-lg backdrop-filter md:w-[360px] w-full h-fit;
 }
 
+.movie_card {
+  @apply flex-1 break-inside-avoid rounded-lg border-2 border-sky-600 bg-white/20 bg-clip-padding p-6 pb-4 backdrop-blur-lg backdrop-filter md:w-[600] w-full h-fit;
+}
 .flex-center {
   @apply flex justify-center items-center;
 }

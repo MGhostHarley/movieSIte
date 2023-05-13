@@ -1,20 +1,24 @@
 "use client";
+import Link from "next/link";
 
 import { useState, useEffect } from "react";
+import { getMovies } from "@utils/getMovies";
 
 import PromptCard from "./PromptCard";
 
-const PromptCardList = ({ data, handleTagClick }) => {
-  return (
+const PromptCardList = ({ data }) => {
+  console.log(data, "datata");
+
+  return data ? (
     <div className="mt-16 prompt_layout">
       {data.map((post) => (
-        <PromptCard
-          key={post._id}
-          post={post}
-          handleTagClick={handleTagClick}
-        />
+        <PromptCard key={post.imdbID} post={post} />
       ))}
     </div>
+  ) : (
+    <h1 className="font-bold text-red-600 text-[30px]">
+      No movie was found with that title
+    </h1>
   );
 };
 
@@ -25,46 +29,36 @@ const Feed = () => {
   const [searchText, setSearchText] = useState("");
   const [searchTimeout, setSearchTimeout] = useState(null);
   const [searchedResults, setSearchedResults] = useState([]);
+  const [submitting, setIsSubmitting] = useState(false);
 
-  const fetchPosts = async () => {
-    const response = await fetch("/api/prompt");
-    const data = await response.json();
+  // const fetchPosts = async () => {
+  //   const response = await fetch("/api/prompt");
+  //   const data = await response.json();
 
+  //   setAllPosts(data);
+  // };
+
+  // };
+  const fetchMovies = async () => {
+    const data = await getMovies(searchText);
     setAllPosts(data);
   };
 
-  useEffect(() => {
-    fetchPosts();
-  }, []);
+  console.log(allPosts, " allposts");
 
-  const filterPrompts = (searchtext) => {
-    const regex = new RegExp(searchtext, "i"); // 'i' flag for case-insensitive search
-    return allPosts.filter(
-      (item) =>
-        regex.test(item.creator.username) ||
-        regex.test(item.tag) ||
-        regex.test(item.prompt)
-    );
+  const handleSearchChange = (event) => {
+    setSearchText(event.target.value);
+    console.log(searchText, "bin change");
   };
 
-  const handleSearchChange = (e) => {
-    clearTimeout(searchTimeout);
-    setSearchText(e.target.value);
+  const keyEnter = (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
 
-    // debounce method
-    setSearchTimeout(
-      setTimeout(() => {
-        const searchResult = filterPrompts(e.target.value);
-        setSearchedResults(searchResult);
-      }, 500)
-    );
-  };
-
-  const handleTagClick = (tagName) => {
-    setSearchText(tagName);
-
-    const searchResult = filterPrompts(tagName);
-    setSearchedResults(searchResult);
+      setSearchText(event.target.value);
+      fetchMovies();
+      console.log(searchText, "Moo");
+    }
   };
 
   return (
@@ -75,20 +69,25 @@ const Feed = () => {
           placeholder="Search for a tag or a username"
           value={searchText}
           onChange={handleSearchChange}
+          onKeyDown={keyEnter}
           required
           className="search_input peer"
         />
       </form>
+      <div className="flex mx-3 mb-5 gap-4">
+        <button
+          onClick={fetchMovies}
+          type="submit"
+          disabled={submitting}
+          className="px-5 py-3 text-sm bg-sky-500 rounded-full text-white"
+        >
+          {submitting ? `Loading for ${searchText}...` : "Search Movie"}
+        </button>
+      </div>
 
       {/* All Prompts */}
-      {searchText ? (
-        <PromptCardList
-          data={searchedResults}
-          handleTagClick={handleTagClick}
-        />
-      ) : (
-        <PromptCardList data={allPosts} handleTagClick={handleTagClick} />
-      )}
+
+      <PromptCardList data={allPosts} />
     </section>
   );
 };
