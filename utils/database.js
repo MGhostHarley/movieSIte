@@ -2,6 +2,8 @@ import mongoose from "mongoose";
 
 let isConnected = false;
 export const connectToDatabase = async () => {
+  console.log(mongoose.connection.models, "MODELS");
+
   mongoose.set("strictQuery", true);
 
   if (isConnected) {
@@ -11,7 +13,7 @@ export const connectToDatabase = async () => {
 
   try {
     await mongoose.connect(process.env.MONGODB_URI, {
-      dbName: "prompts",
+      dbName: "movie_site",
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });

@@ -6,11 +6,70 @@ import { useSession } from "next-auth/react";
 import { usePathname, useRouter } from "next/navigation";
 
 const PromptCard = ({ post }) => {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const pathName = usePathname();
   const router = useRouter();
 
   const [copied, setCopied] = useState("");
+  const [isBookmark, setIsBookmark] = useState(false);
+  const [isWatchList, setIsWatchList] = useState(false);
+
+  const updateBookmarks = async (params) => {
+    const response = await fetch(`/api/users/updateBookmarks`, {
+      method: "POST",
+      body: JSON.stringify(params),
+    });
+    const data = await response.json();
+    console.log(data, "returned response");
+    return data;
+    console.log("pass");
+  };
+
+  const handleBookmarkCheckbox = (event) => {
+    const checked = event.target.checked;
+    const value = event.target.value;
+
+    if (status !== "authenticated") {
+      alert(`You must be logged in to bookmark a movie`);
+      event.target.checked = false;
+      return;
+    }
+    console.log(`Checked value: ${value}, checked? : ${checked}`);
+    console.log(post, " POST");
+    console.log(`${status} : SESSION status`);
+    const params = {
+      id: session.user.id,
+      movie: post,
+      state: checked,
+      type: "bookmark",
+      email: session.user.email,
+    };
+    console.log(params, "PARAMS");
+    const success = updateBookmarks(params, checked);
+  };
+
+  const handleWatchListCheckbox = (event) => {
+    const checked = event.target.checked;
+    const value = event.target.value;
+
+    if (status !== "authenticated") {
+      alert(`You must be logged in to bookmark a movie`);
+      event.target.checked = false;
+      return;
+    }
+    console.log(`Checked value: ${value}, checked? : ${checked}`);
+    console.log(post, " POST");
+    console.log(`${status} : SESSION status`);
+    const params = {
+      id: session.user.id,
+      movie: post,
+      state: checked,
+      type: "watchList",
+      email: session.user.email,
+    };
+    console.log(params, "PARAMS");
+    const success = updateBookmarks(params, checked);
+  };
 
   const handleMovieClick = () => {
     console.log(post);
@@ -19,8 +78,8 @@ const PromptCard = ({ post }) => {
   };
 
   const handleCopy = () => {
-    setCopied(post.prompt);
-    navigator.clipboard.writeText(post.prompt);
+    setCopied(post.Title);
+    navigator.clipboard.writeText(post.Title);
     setTimeout(() => setCopied(false), 3000);
   };
 
@@ -50,11 +109,11 @@ const PromptCard = ({ post }) => {
         <div className="copy_btn" onClick={handleCopy}>
           <Image
             src={
-              copied === post.prompt
+              copied === post.Title
                 ? "/assets/icons/tick.svg"
                 : "/assets/icons/copy.svg"
             }
-            alt={copied === post.prompt ? "tick_icon" : "copy_icon"}
+            alt={copied === post.Title ? "tick_icon" : "copy_icon"}
             width={12}
             height={12}
           />
@@ -77,6 +136,7 @@ const PromptCard = ({ post }) => {
             id="bookmarked?"
             type="checkbox"
             value=""
+            onClick={handleBookmarkCheckbox}
             className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
           ></input>
           <label
@@ -91,6 +151,7 @@ const PromptCard = ({ post }) => {
             id="watched?"
             type="checkbox"
             value=""
+            onClick={handleWatchListCheckbox}
             className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
           ></input>
           <label

@@ -3,8 +3,8 @@
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 
-import User from "@models/user";
 import { connectToDatabase } from "@utils/database";
+import movieUser from "@models/user";
 
 const handler = NextAuth({
   providers: [
@@ -16,7 +16,9 @@ const handler = NextAuth({
   callbacks: {
     async session({ session }) {
       // store the user id from MongoDB to session
-      const sessionUser = await User.findOne({ email: session.user.email });
+      const sessionUser = await movieUser.findOne({
+        email: session.user.email,
+      });
       session.user.id = sessionUser._id.toString();
 
       return session;
@@ -26,16 +28,18 @@ const handler = NextAuth({
         await connectToDatabase();
 
         // check if user already exists
-        const userExists = await User.findOne({ email: profile.email });
+        const userExists = await movieUser.findOne({ email: profile.email });
         console.log(profile.name, "PROFILE NAME");
 
         // if not, create a new document and save user in MongoDB
 
         if (!userExists) {
-          await User.create({
+          await movieUser.create({
             email: profile.email,
             username: profile.name.replaceAll(" ", "").toLowerCase(),
             image: profile.picture,
+            bookmarked_movies: [],
+            watched_movies: [],
           });
         }
 
