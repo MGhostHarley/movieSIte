@@ -26,19 +26,25 @@ const Nav = () => {
           height={30}
           className="object-contain"
         />
-        <p className="logo_text">AIPrompt</p>
+        <p className="logo_text">MovieBin</p>
       </Link>
 
       {/* Desktop Nav */}
       <div className="sm:flex hidden">
         {session?.user ? (
           <div className="flex gap-3 md:gap-5">
-            <Link href="/create-prompt" className="black_btn">
-              Create Post
-            </Link>
-            <button type="button" onClick={signOut} className="outline_btn">
+            <button
+              type="button"
+              onClick={() =>
+                signOut({
+                  callbackUrl: "/",
+                })
+              }
+              className="outline_btn"
+            >
               Sign Out
             </button>
+
             <Link href="/profile">
               <Image
                 src={session?.user.image}
@@ -71,7 +77,7 @@ const Nav = () => {
         {session?.user ? (
           <div className="flex">
             <Image
-              src="/assets/images/profile_pic.jpeg"
+              src={session?.user.image}
               className="rounded-full"
               alt="profile"
               width={37}
@@ -90,14 +96,7 @@ const Nav = () => {
                   {" "}
                   My Profile
                 </Link>
-                <Link
-                  href="/create-prompt"
-                  className="dropdown_link"
-                  onClick={() => setToggleDropdown(false)}
-                >
-                  {" "}
-                  Create Prompt
-                </Link>
+
                 <button
                   type="button"
                   onClick={() => {

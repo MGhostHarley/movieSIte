@@ -3,8 +3,11 @@ import Nav from "@components/Nav";
 import Provider from "@components/Provider";
 
 export const metadata = {
-  title: "PromptFinder",
-  description: "Find AI Prompts",
+  title: "MovieBin",
+  description: "Find Movies You Love",
+  icons: {
+    icon: "/assets/images/logo.svg",
+  },
 };
 
 const RootLayout = ({ children }) => {

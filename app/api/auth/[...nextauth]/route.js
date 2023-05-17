@@ -6,6 +6,11 @@ import GoogleProvider from "next-auth/providers/google";
 import { connectToDatabase } from "@utils/database";
 import movieUser from "@models/user";
 
+function getRandom(length) {
+  return Math.floor(
+    Math.pow(10, length - 1) + Math.random() * 9 * Math.pow(10, length - 1)
+  );
+}
 const handler = NextAuth({
   providers: [
     GoogleProvider({
@@ -29,14 +34,13 @@ const handler = NextAuth({
 
         // check if user already exists
         const userExists = await movieUser.findOne({ email: profile.email });
-        console.log(profile.name, "PROFILE NAME");
 
         // if not, create a new document and save user in MongoDB
-
+        const idToken = getRandom(3);
         if (!userExists) {
           await movieUser.create({
             email: profile.email,
-            username: profile.name.replaceAll(" ", "").toLowerCase(),
+            username: profile.name.replaceAll(" ", "").toLowerCase() + idToken,
             image: profile.picture,
             bookmarked_movies: [],
             watched_movies: [],

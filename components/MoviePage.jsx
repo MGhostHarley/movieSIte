@@ -1,19 +1,72 @@
 "use client";
-import React from "react";
+import { useState } from "react";
 import Image from "next/image";
 import useMediaQuery from "@hooks/useMediaQuery";
+import { useSession } from "next-auth/react";
 
 const MoviePage = ({ name, desc, movieData }) => {
-  console.log(movieData, typeof movieData, "in movie page");
-  console.log(movieData.poster, "Poster");
+  const { data: session, status } = useSession();
+  const [isBookmark, setIsBookmark] = useState(false);
+  const [isWatchList, setIsWatchList] = useState(false);
   const isAboveLarge = useMediaQuery("(min-width: 1025px)");
   let toWrap = " ";
+
   if (isAboveLarge) {
     toWrap = " ";
   } else {
     toWrap = "flex-wrap ";
   }
 
+  const updateBookmarks = async (params) => {
+    const response = await fetch(`/api/users/updateBookmarks`, {
+      method: "POST",
+      body: JSON.stringify(params),
+    });
+    const data = await response.json();
+    return data;
+  };
+
+  const handleBookmarkCheckbox = (event) => {
+    const checked = event.target.checked;
+    const value = event.target.value;
+
+    if (status !== "authenticated") {
+      alert(`You must be logged in to bookmark a movie`);
+      event.target.checked = false;
+      return;
+    }
+
+    const params = {
+      id: session.user.id,
+      movie: movieData,
+      state: checked,
+      type: "bookmark",
+      email: session.user.email,
+    };
+    const success = updateBookmarks(params, checked);
+    setIsBookmark(!isBookmark);
+  };
+
+  const handleWatchListCheckbox = (event) => {
+    const checked = event.target.checked;
+    const value = event.target.value;
+
+    if (status !== "authenticated") {
+      alert(`You must be logged in to bookmark a movie`);
+      event.target.checked = false;
+      return;
+    }
+
+    const params = {
+      id: session.user.id,
+      movie: movieData,
+      state: checked,
+      type: "watchList",
+      email: session.user.email,
+    };
+    const success = updateBookmarks(params, checked);
+    setIsWatchList(!isWatchList);
+  };
   return (
     <>
       {" "}
@@ -119,6 +172,7 @@ const MoviePage = ({ name, desc, movieData }) => {
               id="bookmarked?"
               type="checkbox"
               value=""
+              onClick={handleBookmarkCheckbox}
               className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
             ></input>
             <label
@@ -133,6 +187,7 @@ const MoviePage = ({ name, desc, movieData }) => {
               id="watched?"
               type="checkbox"
               value=""
+              onClick={handleWatchListCheckbox}
               className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-green-500 dark:focus:ring-green-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
             ></input>
             <label

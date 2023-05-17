@@ -4,10 +4,12 @@ const Home = () => {
   return (
     <section className="w-full flex-center flex-col">
       <h1 className="head_text text-center">
-        Discover and share
+        Discover New
         <br className="max-md:hidden" />
-        <span className="orange_gradient text-center"> AI-powered Prompts</span>
-        <p className="desc text-center">Finding new Prompts</p>
+        <span className="orange_gradient text-center">
+          Worlds Through Cinema
+        </span>
+        <p className="desc text-center">Finding Movies That You Love</p>
       </h1>
       <Feed />
     </section>
